@@ -2,9 +2,12 @@
 #include <cstring>
 
 namespace rocket {
+
 FdEvent::FdEvent(int fd) : m_fd(fd) {
   memset(&m_listen_event, 0, sizeof(m_listen_event));
 }
+
+FdEvent::FdEvent() { memset(&m_listen_event, 0, sizeof(m_listen_event)); }
 
 FdEvent::~FdEvent() {}
 

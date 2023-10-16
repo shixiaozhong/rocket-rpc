@@ -3,6 +3,8 @@
 #include "rocket/common/mutex.h"
 #include "rocket/common/util.h"
 #include "rocket/net/fd_event.h"
+#include "rocket/net/timer.h"
+#include "rocket/net/timer_event.h"
 #include "rocket/net/wakeup_fd_event.h"
 #include <functional>
 #include <mutex>
@@ -37,11 +39,15 @@ public:
   // 添加任务
   void addTask(std::function<void()> cb, bool is_wake_up = false);
 
+  void addTimerEvent(TimerEvent::s_ptr event);
+
 private:
   void dealWakeup(){};
 
   // 初始化wakeUpEvent
   void initWakeUpFdEvent();
+
+  void initTimer();
 
 private:
   pid_t m_thread_id{0};                      // 当前线程id
@@ -52,7 +58,9 @@ private:
   std::set<int> m_listen_fds; // 储存Reactor模型监听的文件描述符列表
   std::queue<std::function<void()>> m_pending_tasks; // 待决任务队列
   Mutex m_mutex;                                     // 互斥锁
+  Timer *m_timer{nullptr};                           // 定时器
 };
+
 } // namespace rocket
 
 #endif

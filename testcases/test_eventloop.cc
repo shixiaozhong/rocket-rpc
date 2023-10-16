@@ -2,8 +2,10 @@
 #include "rocket/common/log.h"
 #include "rocket/net/eventloop.h"
 #include "rocket/net/fd_event.h"
+#include "rocket/net/timer_event.h"
 #include <arpa/inet.h>
 #include <cstring>
+#include <memory>
 #include <netinet/in.h>
 #include <pthread.h>
 #include <sys/socket.h>
@@ -51,6 +53,13 @@ int main() {
   });
 
   event_loop->addEpollEvent(&event);
+
+  int i = 0;
+  auto timer_event = std::make_shared<rocket::TimerEvent>(
+      1000, true, [&i]() { DEBUGLOG("trigger timer event, count=[%d]", i++); });
+
+  event_loop->addTimerEvent(timer_event);
+
   event_loop->loop();
 
   return 0;

@@ -1,5 +1,6 @@
 #include "rocket/net/eventloop.h"
 #include "rocket/common/log.h"
+#include "rocket/net/timer.h"
 #include <chrono>
 #include <cstring>
 #include <sys/epoll.h>
@@ -71,6 +72,9 @@ EventLoop::EventLoop() {
 
   // 初始化wakeUpEvent
   initWakeUpFdEvent();
+
+  // 初始化Timer
+  initTimer();
   INFOLOG("success create event loop in thread %d", m_thread_id);
 
   t_current_eventloop = this;
@@ -83,6 +87,16 @@ EventLoop::~EventLoop() {
     delete m_wakeup_fd_event;
     m_wakeup_fd_event = nullptr;
   }
+
+  if (m_timer) {
+    delete m_timer;
+    m_timer = nullptr;
+  }
+}
+
+void EventLoop::initTimer() {
+  m_timer = new Timer();
+  addEpollEvent(m_timer);
 }
 
 void EventLoop::initWakeUpFdEvent() {
@@ -210,6 +224,10 @@ void EventLoop::addTask(std::function<void()> cb, bool is_wake_up) {
   if (is_wake_up) {
     wakeup();
   }
+}
+
+void EventLoop::addTimerEvent(TimerEvent::s_ptr event) {
+  m_timer->addTimerEvent(event);
 }
 
 } // namespace rocket

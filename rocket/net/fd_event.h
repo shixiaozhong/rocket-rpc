@@ -14,6 +14,8 @@ public:
 
   FdEvent(int fd);
 
+  FdEvent();
+
   ~FdEvent();
 
   // 处理触发事件的类型，返回对应的回调函数

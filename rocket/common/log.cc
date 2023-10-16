@@ -89,7 +89,7 @@ void Logger::log() {
   while (!tmp.empty()) {
     std::string msg = tmp.front();
     tmp.pop();
-    printf(msg.c_str());
+    printf("%s", msg.c_str());
   }
 }
 

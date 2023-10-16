@@ -1,5 +1,6 @@
 #include "rocket/common/util.h"
 #include <sys/syscall.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -21,6 +22,12 @@ pid_t getThreadId() {
     return g_thread_id;
   }
   return syscall(SYS_gettid);
+}
+
+int64_t getNowMs() {
+  timeval now_time;
+  gettimeofday(&now_time, nullptr);
+  return now_time.tv_sec * 1000 + now_time.tv_usec / 1000;
 }
 
 } // namespace rocket
