@@ -17,20 +17,22 @@ EPOLL_CTL_DEL：从 epoll 实例中删除文件描述符 fd。
 
 */
 
-#define ADD_TO_EPOLL()                                                              \
-  auto it = m_listen_fds.find(event->getFd());                                      \
-  int op = EPOLL_CTL_ADD;                                                           \
-  if (it != m_listen_fds.end()) {                                                   \
-    op = EPOLL_CTL_MOD;                                                             \
-  }                                                                                 \
-  epoll_event tmp = event->getEpollEvent(); /*获取FdEvent对应的epoll_event*/   \
-  INFOLOG("epoll_event.events = %d", (int)tmp.events);                              \
-  int rt = epoll_ctl(m_epoll_fd, op, event->getFd(),                                \
-                     &tmp); /*epoll中加入或者修改event对应的epoll_event*/ \
-  if (rt == -1) {                                                                   \
-    ERRORLOG("failed epoll_ctl when add fd, errno=%d, errno=%s", errno,             \
-             std::strerror(errno));                                                 \
-  }                                                                                 \
+#define ADD_TO_EPOLL()                                                         \
+  auto it = m_listen_fds.find(event->getFd());                                 \
+  int op = EPOLL_CTL_ADD;                                                      \
+  if (it != m_listen_fds.end()) {                                              \
+    op = EPOLL_CTL_MOD;                                                        \
+  }                                                                            \
+  /*获取FdEvent对应的epoll_event*/                                        \
+  epoll_event tmp = event->getEpollEvent();                                    \
+  INFOLOG("epoll_event.events = %d", (int)tmp.events);                         \
+  /*epoll中加入或者修改event对应的epoll_event*/                      \
+  int rt = epoll_ctl(m_epoll_fd, op, event->getFd(), &tmp);                    \
+  if (rt == -1) {                                                              \
+    ERRORLOG("failed epoll_ctl when add fd, errno=%d, errno=%s", errno,        \
+             std::strerror(errno));                                            \
+  }                                                                            \
+  m_listen_fds.insert(event->getFd());                                         \
   DEBUGLOG("add event success, fd[%d]", event->getFd());
 
 #define DEL_TO_EPOLL()                                                         \
@@ -40,12 +42,13 @@ EPOLL_CTL_DEL：从 epoll 实例中删除文件描述符 fd。
   }                                                                            \
   int op = EPOLL_CTL_DEL;                                                      \
   epoll_event tmp = event->getEpollEvent();                                    \
-  int rt = epoll_ctl(m_epoll_fd, op, event->getFd(),                           \
-                     &tmp); /*从epoll中删除FdEvent对应的epoll_event*/   \
+  /*从epoll中删除FdEvent对应的epoll_event*/                             \
+  int rt = epoll_ctl(m_epoll_fd, op, event->getFd(), &tmp);                    \
   if (rt == -1) {                                                              \
     ERRORLOG("failed epoll_ctl when add fd errno=%d, error=%s", errno,         \
              std::strerror(errno));                                            \
   }                                                                            \
+  m_listen_fds.erase(event->getFd());                                          \
   DEBUGLOG("delete event success, fd[%d]", event->getFd());
 
 namespace rocket {
@@ -131,7 +134,7 @@ void EventLoop::initWakeUpFdEvent() {
 
 void EventLoop::loop() {
   while (!m_is_stop_flag) {
-    ScopeMutext<Mutex> lock(m_mutex);
+    ScopeMutex<Mutex> lock(m_mutex);
     std::queue<std::function<void()>> tmp_tasks;
     m_pending_tasks.swap(
         tmp_tasks); // 将pending_tasks中数据交换到tmp中去做处理，顺便清空pending_tasks
@@ -217,7 +220,7 @@ void EventLoop::deleteEpollEvent(FdEvent *event) {
 }
 
 void EventLoop::addTask(std::function<void()> cb, bool is_wake_up) {
-  ScopeMutext<Mutex> lock(m_mutex);
+  ScopeMutex<Mutex> lock(m_mutex);
   m_pending_tasks.push(cb);
   lock.unlock();
   // 判断是否需要wake_up
@@ -230,4 +233,11 @@ void EventLoop::addTimerEvent(TimerEvent::s_ptr event) {
   m_timer->addTimerEvent(event);
 }
 
+EventLoop *EventLoop::GetCurrentEventLoop() {
+  if (t_current_eventloop) {
+    return t_current_eventloop;
+  }
+  t_current_eventloop = new EventLoop();
+  return t_current_eventloop;
+}
 } // namespace rocket

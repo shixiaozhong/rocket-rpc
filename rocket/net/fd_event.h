@@ -18,6 +18,8 @@ public:
 
   ~FdEvent();
 
+  void setNonBlocking();
+
   // 处理触发事件的类型，返回对应的回调函数
   std::function<void()> handler(TriggerEvent event_type);
 
@@ -29,6 +31,8 @@ public:
 
   // 获取文件描述符对应的epoll_event
   epoll_event getEpollEvent() const { return m_listen_event; }
+
+  void cancel(TriggerEvent event_type);
 
 protected:
   int m_fd{-1};                           // 文件描述符
