@@ -39,7 +39,11 @@ public:
   // 添加任务
   void addTask(std::function<void()> cb, bool is_wake_up = false);
 
+  // 添加定时任务
   void addTimerEvent(TimerEvent::s_ptr event);
+
+  // 是否正在looping
+  bool isLooping() const { return m_is_looping; }
 
 public:
   static EventLoop *GetCurrentEventLoop();
@@ -58,6 +62,7 @@ private:
   int m_wakeup_fd{0};                        // wakeUpEvent的fd
   WakeUpFdEvent *m_wakeup_fd_event{nullptr}; // wakeUpEvent对应的指针
   bool m_is_stop_flag{false};                // loop循环停止的标志
+  bool m_is_looping{false};                  // 是否正在loop中
   std::set<int> m_listen_fds; // 储存Reactor模型监听的文件描述符列表
   std::queue<std::function<void()>> m_pending_tasks; // 待决任务队列
   Mutex m_mutex;                                     // 互斥锁

@@ -133,6 +133,8 @@ void EventLoop::initWakeUpFdEvent() {
 }
 
 void EventLoop::loop() {
+  m_is_looping = true;
+
   while (!m_is_stop_flag) {
     ScopeMutex<Mutex> lock(m_mutex);
     std::queue<std::function<void()>> tmp_tasks;
