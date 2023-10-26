@@ -1,4 +1,6 @@
 #include "rocket/common/util.h"
+#include <arpa/inet.h>
+#include <cstring>
 #include <sys/syscall.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -28,6 +30,12 @@ int64_t getNowMs() {
   timeval now_time;
   gettimeofday(&now_time, nullptr);
   return now_time.tv_sec * 1000 + now_time.tv_usec / 1000;
+}
+
+int32_t getInt32FromNetByte(const char *buf) {
+  int32_t result;
+  memcpy(&result, buf, sizeof(result));
+  return ntohl(result);
 }
 
 } // namespace rocket
