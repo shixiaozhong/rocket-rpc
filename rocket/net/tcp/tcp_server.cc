@@ -1,7 +1,9 @@
 #include "rocket/net/tcp/tcp_server.h"
+
+#include <string>
+
 #include "rocket/common/log.h"
 #include "rocket/net/tcp/tcp_connection.h"
-#include <string>
 
 namespace rocket {
 TcpServer::TcpServer(NetAddr::s_ptr local_addr) : m_local_addr(local_addr) {
@@ -49,7 +51,7 @@ void TcpServer::onAccept() {
 
   // 为client建立新连接
   TcpConnection::s_ptr connection = std::make_shared<TcpConnection>(
-      io_thread->getEventLoop(), client_fd, 128, peer_addr);
+      io_thread->getEventLoop(), client_fd, 128, m_local_addr, peer_addr);
 
   // 设置建立的连接为Connected
   connection->setState(TcpState::Connected);
@@ -68,4 +70,4 @@ void TcpServer::start() {
   m_main_eventloop->loop();
 }
 
-} // namespace rocket
+}  // namespace rocket

@@ -1,7 +1,9 @@
 #include "rocket/net/tcp/tcp_client.h"
+
+#include <cstring>
+
 #include "rocket/common/log.h"
 #include "rocket/net/fd_event_group.h"
-#include <cstring>
 
 namespace rocket {
 TcpClient::TcpClient(NetAddr::s_ptr peer_addr) : m_peer_addr(peer_addr) {
@@ -16,9 +18,9 @@ TcpClient::TcpClient(NetAddr::s_ptr peer_addr) : m_peer_addr(peer_addr) {
   }
   m_fd_event = FdEventGroup::GetFdEventGroup()->getFdEvent(m_fd);
   m_fd_event->setNonBlocking();
-  m_connection =
-      std::make_shared<TcpConnection>(m_event_loop, m_fd, 128, m_peer_addr,
-                                      TcpConnectionType::TcpConnectionByClient);
+  m_connection = std::make_shared<TcpConnection>(
+      m_event_loop, m_fd, 128, nullptr, m_peer_addr,
+      TcpConnectionType::TcpConnectionByClient);
   m_connection->setTcpConnectionType(TcpConnectionType::TcpConnectionByClient);
 }
 
@@ -94,4 +96,4 @@ void TcpClient::writeMessage(
   m_connection->listenWrite();
 }
 
-} // namespace rocket
+}  // namespace rocket

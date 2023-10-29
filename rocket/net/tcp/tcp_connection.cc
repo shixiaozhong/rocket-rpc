@@ -1,16 +1,22 @@
 #include "rocket/net/tcp/tcp_connection.h"
+
+#include <unistd.h>
+
 #include "rocket/common/log.h"
 #include "rocket/net/coder/abstract_protocol.h"
 #include "rocket/net/fd_event_group.h"
-#include <unistd.h>
 
 namespace rocket {
 TcpConnection::TcpConnection(
-    EventLoop *event_loop, int fd, int buffer_size, NetAddr::s_ptr peer_addr,
+    EventLoop *event_loop, int fd, int buffer_size, NetAddr::s_ptr local_addr,
+    NetAddr::s_ptr peer_addr,
     TcpConnectionType type /*TcpConnectionType::TcpConnectionByServer*/)
-    : m_event_loop(event_loop), m_peer_addr(peer_addr),
-      m_state(TcpState::NotConnected), m_fd(fd), m_connection_type(type) {
-
+    : m_event_loop(event_loop),
+      m_local_addr(local_addr),
+      m_peer_addr(peer_addr),
+      m_state(TcpState::NotConnected),
+      m_fd(fd),
+      m_connection_type(type) {
   // 创建输入输出的buffer
   m_in_buffer = std::make_shared<TcpBuffer>(buffer_size);
   m_out_buffer = std::make_shared<TcpBuffer>(buffer_size);
@@ -98,9 +104,10 @@ void TcpConnection::onRead() {
 void TcpConnection::onWrite() {
   // 将当前out_buffer中的所有数据全部发送给client
   if (m_state != TcpState::Connected) {
-    INFOLOG("onWrite error, client has already disconnected, addr[%s], "
-            "clientfd[%d]",
-            m_peer_addr->toString().c_str(), m_fd);
+    INFOLOG(
+        "onWrite error, client has already disconnected, addr[%s], "
+        "clientfd[%d]",
+        m_peer_addr->toString().c_str(), m_fd);
     return;
   }
 
@@ -175,8 +182,10 @@ void TcpConnection::excute() {
       // 2. 将响应message放到发送缓冲区，监听可写事件回包
 
       auto message = std::make_shared<TinyPBProtocol>();
-      message->m_pb_data = "hello. this is rocket rpc test data";
-      message->m_req_id = e->m_req_id;
+      // message->m_pb_data = "hello. this is rocket rpc test data";
+      // message->m_req_id = e->m_req_id;
+
+      RpcDispatcher::GetRpcDispatcherInstance()->dispatch(e, message, this);
 
       responses.emplace_back(message);
     }
@@ -267,4 +276,4 @@ void TcpConnection::pushReadMessage(
     std::function<void(AbstractProtocol::s_ptr)> done) {
   m_read_dones.insert(std::make_pair(req_id, done));
 }
-} // namespace rocket
+}  // namespace rocket
