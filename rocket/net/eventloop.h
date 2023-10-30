@@ -1,20 +1,22 @@
 #ifndef ROCKET_NET_EVENTLOOP_h
 #define ROCKET_NET_EVENTLOOP_H
+#include <pthread.h>
+
+#include <functional>
+#include <mutex>
+#include <queue>
+#include <set>
+
 #include "rocket/common/mutex.h"
 #include "rocket/common/util.h"
 #include "rocket/net/fd_event.h"
 #include "rocket/net/timer.h"
 #include "rocket/net/timer_event.h"
 #include "rocket/net/wakeup_fd_event.h"
-#include <functional>
-#include <mutex>
-#include <pthread.h>
-#include <queue>
-#include <set>
 
 namespace rocket {
 class EventLoop {
-public:
+ public:
   EventLoop();
   ~EventLoop();
 
@@ -25,7 +27,7 @@ public:
   void wakeup() { m_wakeup_fd_event->wakeup(); }
 
   // 停止
-  void stop() { m_is_stop_flag = true; }
+  void stop();
 
   // 添加epoll_event
   void addEpollEvent(FdEvent *event);
@@ -45,10 +47,10 @@ public:
   // 是否正在looping
   bool isLooping() const { return m_is_looping; }
 
-public:
+ public:
   static EventLoop *GetCurrentEventLoop();
 
-private:
+ private:
   void dealWakeup(){};
 
   // 初始化wakeUpEvent
@@ -56,19 +58,19 @@ private:
 
   void initTimer();
 
-private:
-  pid_t m_thread_id{0};                      // 当前线程id
-  int m_epoll_fd{0};                         // 标识epoll实例
-  int m_wakeup_fd{0};                        // wakeUpEvent的fd
-  WakeUpFdEvent *m_wakeup_fd_event{nullptr}; // wakeUpEvent对应的指针
-  bool m_is_stop_flag{false};                // loop循环停止的标志
-  bool m_is_looping{false};                  // 是否正在loop中
-  std::set<int> m_listen_fds; // 储存Reactor模型监听的文件描述符列表
-  std::queue<std::function<void()>> m_pending_tasks; // 待决任务队列
-  Mutex m_mutex;                                     // 互斥锁
-  Timer *m_timer{nullptr};                           // 定时器
+ private:
+  pid_t m_thread_id{0};                       // 当前线程id
+  int m_epoll_fd{0};                          // 标识epoll实例
+  int m_wakeup_fd{0};                         // wakeUpEvent的fd
+  WakeUpFdEvent *m_wakeup_fd_event{nullptr};  // wakeUpEvent对应的指针
+  bool m_is_stop_flag{false};                 // loop循环停止的标志
+  bool m_is_looping{false};                   // 是否正在loop中
+  std::set<int> m_listen_fds;  // 储存Reactor模型监听的文件描述符列表
+  std::queue<std::function<void()>> m_pending_tasks;  // 待决任务队列
+  Mutex m_mutex;                                      // 互斥锁
+  Timer *m_timer{nullptr};                            // 定时器
 };
 
-} // namespace rocket
+}  // namespace rocket
 
 #endif

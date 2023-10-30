@@ -64,6 +64,12 @@ $(PATH_BIN)/test_server: $(LIB_OUT)
 $(PATH_BIN)/test_client: $(LIB_OUT)
 	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_client.cc -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread	
 
+$(PATH_BIN)/test_rpc_client: $(LIB_OUT)
+	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_rpc_client.cc $(PATH_TESTCASES)/order.pb.cc -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
+
+$(PATH_BIN)/test_rpc_server: $(LIB_OUT)
+	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_rpc_server.cc $(PATH_TESTCASES)/order.pb.cc -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
+
 $(LIB_OUT): $(COMM_OBJ) $(NET_OBJ) $(TCP_OBJ) $(CODER_OBJ) $(RPC_OBJ)
 	cd $(PATH_OBJ) && ar rcv librocket.a *.o && cp librocket.a ../lib/
 
@@ -82,11 +88,7 @@ $(PATH_OBJ)/%.o : $(PATH_CODER)/%.cc
 $(PATH_OBJ)/%.o : $(PATH_RPC)/%.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(PATH_BIN)/test_rpc_client: $(LIB_OUT)
-	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_rpc_client.cc $(PATH_TESTCASES)/order.pb.cc -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
 
-$(PATH_BIN)/test_rpc_server: $(LIB_OUT)
-	$(CXX) $(CXXFLAGS) $(PATH_TESTCASES)/test_rpc_server.cc $(PATH_TESTCASES)/order.pb.cc -o $@ $(LIB_OUT) $(LIBS) -ldl -pthread
 
 # print something test
 # like this: make PRINT-PATH_BIN, and then will print variable PATH_BIN

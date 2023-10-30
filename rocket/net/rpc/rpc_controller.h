@@ -32,8 +32,10 @@ class RpcController : public google::protobuf::RpcController {
   std::string getErrorInfo() const;
 
   // reqId
-  void setReqId(const std::string& req_id);
-  std::string getReqId() const;
+  void setMsgId(const std::string& msg_id);
+  std::string getMsgId() const;
+
+  void setError(int32_t error_code, const std::string error_info);
 
   // timeout
   void setTimeout(const int32_t timeout);
@@ -48,10 +50,10 @@ class RpcController : public google::protobuf::RpcController {
   NetAddr::s_ptr getPeerAddr() const;
 
  private:
-  int m_err_code{0};
+  int m_error_code{0};
 
-  std::string m_err_info;
-  std::string m_req_id;
+  std::string m_error_info;
+  std::string m_msg_id;
 
   bool m_is_failed{false};
   bool m_is_canceled{false};

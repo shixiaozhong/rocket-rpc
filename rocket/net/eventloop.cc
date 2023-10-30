@@ -1,11 +1,14 @@
 #include "rocket/net/eventloop.h"
-#include "rocket/common/log.h"
-#include "rocket/net/timer.h"
-#include <chrono>
-#include <cstring>
+
 #include <sys/epoll.h>
 #include <sys/eventfd.h>
 #include <sys/socket.h>
+
+#include <chrono>
+#include <cstring>
+
+#include "rocket/common/log.h"
+#include "rocket/net/timer.h"
 
 /*
 epoll_ctl 函数是 Linux 中用于控制 epoll
@@ -17,45 +20,45 @@ EPOLL_CTL_DEL：从 epoll 实例中删除文件描述符 fd。
 
 */
 
-#define ADD_TO_EPOLL()                                                         \
-  auto it = m_listen_fds.find(event->getFd());                                 \
-  int op = EPOLL_CTL_ADD;                                                      \
-  if (it != m_listen_fds.end()) {                                              \
-    op = EPOLL_CTL_MOD;                                                        \
-  }                                                                            \
-  /*获取FdEvent对应的epoll_event*/                                        \
-  epoll_event tmp = event->getEpollEvent();                                    \
-  INFOLOG("epoll_event.events = %d", (int)tmp.events);                         \
-  /*epoll中加入或者修改event对应的epoll_event*/                      \
-  int rt = epoll_ctl(m_epoll_fd, op, event->getFd(), &tmp);                    \
-  if (rt == -1) {                                                              \
-    ERRORLOG("failed epoll_ctl when add fd, errno=%d, errno=%s", errno,        \
-             std::strerror(errno));                                            \
-  }                                                                            \
-  m_listen_fds.insert(event->getFd());                                         \
-  DEBUGLOG("add event success, fd[%d]", event->getFd());
+#define ADD_TO_EPOLL()                                                  \
+  auto it = m_listen_fds.find(event->getFd());                          \
+  int op = EPOLL_CTL_ADD;                                               \
+  if (it != m_listen_fds.end()) {                                       \
+    op = EPOLL_CTL_MOD;                                                 \
+  }                                                                     \
+  /*获取FdEvent对应的epoll_event*/                                 \
+  epoll_event tmp = event->getEpollEvent();                             \
+  INFOLOG("epoll_event.events = %d", (int)tmp.events);                  \
+  /*epoll中加入或者修改event对应的epoll_event*/               \
+  int rt = epoll_ctl(m_epoll_fd, op, event->getFd(), &tmp);             \
+  if (rt == -1) {                                                       \
+    ERRORLOG("failed epoll_ctl when add fd, errno=%d, errno=%s", errno, \
+             std::strerror(errno));                                     \
+  }                                                                     \
+  m_listen_fds.insert(event->getFd());                                  \
+  DEBUGLOG("add event success, fd [%d]", event->getFd());
 
-#define DEL_TO_EPOLL()                                                         \
-  auto it = m_listen_fds.find(event->getFd());                                 \
-  if (it == m_listen_fds.end()) {                                              \
-    return;                                                                    \
-  }                                                                            \
-  int op = EPOLL_CTL_DEL;                                                      \
-  epoll_event tmp = event->getEpollEvent();                                    \
-  /*从epoll中删除FdEvent对应的epoll_event*/                             \
-  int rt = epoll_ctl(m_epoll_fd, op, event->getFd(), &tmp);                    \
-  if (rt == -1) {                                                              \
-    ERRORLOG("failed epoll_ctl when add fd errno=%d, error=%s", errno,         \
-             std::strerror(errno));                                            \
-  }                                                                            \
-  m_listen_fds.erase(event->getFd());                                          \
-  DEBUGLOG("delete event success, fd[%d]", event->getFd());
+#define DEL_TO_EPOLL()                                                 \
+  auto it = m_listen_fds.find(event->getFd());                         \
+  if (it == m_listen_fds.end()) {                                      \
+    return;                                                            \
+  }                                                                    \
+  int op = EPOLL_CTL_DEL;                                              \
+  epoll_event tmp = event->getEpollEvent();                            \
+  /*从epoll中删除FdEvent对应的epoll_event*/                     \
+  int rt = epoll_ctl(m_epoll_fd, op, event->getFd(), &tmp);            \
+  if (rt == -1) {                                                      \
+    ERRORLOG("failed epoll_ctl when add fd errno=%d, error=%s", errno, \
+             std::strerror(errno));                                    \
+  }                                                                    \
+  m_listen_fds.erase(event->getFd());                                  \
+  DEBUGLOG("delete event success, fd [%d]", event->getFd());
 
 namespace rocket {
 static thread_local EventLoop *t_current_eventloop =
-    nullptr;                        // 获取当前线程的eventloop指针
-static int g_epoll_timeout = 10000; // epoll_wait的延迟时间
-static int g_epoll_max_events = 10; // epoll_wait等待的事件数量
+    nullptr;                         // 获取当前线程的eventloop指针
+static int g_epoll_timeout = 10000;  // epoll_wait的延迟时间
+static int g_epoll_max_events = 10;  // epoll_wait等待的事件数量
 
 EventLoop::EventLoop() {
   // 判断当前线程是否已经创建过了eventloop
@@ -64,8 +67,8 @@ EventLoop::EventLoop() {
     exit(0);
   }
 
-  m_epoll_fd = epoll_create(1); // 创建epoll实例，返回一个文件描述符
-  m_thread_id = getThreadId(); // 获取当前线程id
+  m_epoll_fd = epoll_create(1);  // 创建epoll实例，返回一个文件描述符
+  m_thread_id = getThreadId();  // 获取当前线程id
   if (m_epoll_fd == -1) {
     ERRORLOG(
         "failed to create event loop , epoll_create error , error info[%d]",
@@ -84,7 +87,7 @@ EventLoop::EventLoop() {
 }
 
 EventLoop::~EventLoop() {
-  close(m_epoll_fd); // 关闭文件描述符
+  close(m_epoll_fd);  // 关闭文件描述符
   if (m_wakeup_fd_event) {
     // 如果指针没有释放，将其释放
     delete m_wakeup_fd_event;
@@ -104,20 +107,21 @@ void EventLoop::initTimer() {
 
 void EventLoop::initWakeUpFdEvent() {
   m_wakeup_fd = eventfd(
-      0, EFD_NONBLOCK); // 为wakeUpEvent创建一个fd，并且设置为非阻塞模式。
+      0, EFD_NONBLOCK);  // 为wakeUpEvent创建一个fd，并且设置为非阻塞模式。
   // 非阻塞模式下，对读取和写入操作会立即返回，不会阻塞进程，无法立即完成会将errno设置为EAGAIN
   // 或 EWOULDBLOCK
 
   if (m_wakeup_fd < 0) {
-    ERRORLOG("failed to create wakeUp event fd, eventfd create error, error "
-             "info[%d]",
-             errno);
+    ERRORLOG(
+        "failed to create wakeUp event fd, eventfd create error, error "
+        "info[%d]",
+        errno);
     exit(0);
   }
 
   INFOLOG("wakeup fd = %d", m_wakeup_fd);
 
-  m_wakeup_fd_event = new WakeUpFdEvent(m_wakeup_fd); // new一个wakeUpEvent对象
+  m_wakeup_fd_event = new WakeUpFdEvent(m_wakeup_fd);  // new一个wakeUpEvent对象
 
   // 设置为epoll_event为读事件和设置对应回调函数
   m_wakeup_fd_event->listen(FdEvent::IN_EVENT, [this]() {
@@ -139,7 +143,7 @@ void EventLoop::loop() {
     ScopeMutex<Mutex> lock(m_mutex);
     std::queue<std::function<void()>> tmp_tasks;
     m_pending_tasks.swap(
-        tmp_tasks); // 将pending_tasks中数据交换到tmp中去做处理，顺便清空pending_tasks
+        tmp_tasks);  // 将pending_tasks中数据交换到tmp中去做处理，顺便清空pending_tasks
     lock.unlock();
 
     // 将任务队列中的任务全部处理掉
@@ -170,7 +174,7 @@ void EventLoop::loop() {
       失败时，返回-1，并设置 errno 来指示错误的原因。
     */
     int timeout = g_epoll_timeout;
-    epoll_event result_events[g_epoll_max_events]; // 用于存储发生的事件
+    epoll_event result_events[g_epoll_max_events];  // 用于存储发生的事件
 
     DEBUGLOG("now begin to epoll_wait");
     int rt = epoll_wait(m_epoll_fd, result_events, g_epoll_max_events, timeout);
@@ -183,7 +187,7 @@ void EventLoop::loop() {
       for (int i = 0; i < rt; i++) {
         epoll_event trigger_event = result_events[i];
         FdEvent *fd_event = static_cast<FdEvent *>(
-            trigger_event.data.ptr); // 获取到epoll_event对应的FdEvent
+            trigger_event.data.ptr);  // 获取到epoll_event对应的FdEvent
         if (fd_event == nullptr) {
           continue;
         }
@@ -195,6 +199,16 @@ void EventLoop::loop() {
         if (trigger_event.events & EPOLLOUT) {
           DEBUGLOG("fd %d trigger EPOLLOUT event", fd_event->getFd());
           addTask(fd_event->handler(FdEvent::OUT_EVNET));
+        }
+        // EPOLLERR, EPOLLHUP
+        if (trigger_event.events & EPOLLERR) {
+          DEBUGLOG("fd %d trigger EPOLLERR event", fd_event->getFd());
+          // 出错直接将fd从epoll中删除
+          deleteEpollEvent(fd_event);
+
+          if (fd_event->handler(FdEvent::ERROR_EVENT) != nullptr) {
+            addTask(fd_event->handler(FdEvent::ERROR_EVENT));
+          }
         }
       }
     }
@@ -242,4 +256,10 @@ EventLoop *EventLoop::GetCurrentEventLoop() {
   t_current_eventloop = new EventLoop();
   return t_current_eventloop;
 }
-} // namespace rocket
+
+void EventLoop::stop() {
+  m_is_stop_flag = true;
+  wakeup();
+}
+
+}  // namespace rocket

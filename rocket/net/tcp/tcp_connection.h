@@ -68,7 +68,7 @@ class TcpConnection {
   void pushSendMessage(AbstractProtocol::s_ptr message,
                        std::function<void(AbstractProtocol::s_ptr)> done);
 
-  void pushReadMessage(const std::string req_id,
+  void pushReadMessage(const std::string msg_id,
                        std::function<void(AbstractProtocol::s_ptr)> done);
 
   NetAddr::s_ptr getLocalAddr() const { return m_local_addr; };
@@ -93,7 +93,7 @@ class TcpConnection {
                         std::function<void(AbstractProtocol::s_ptr)>>>
       m_write_dones;
 
-  // key is req_id
+  // key is msg_id
   std::map<std::string, std::function<void(AbstractProtocol::s_ptr)>>
       m_read_dones;
 };

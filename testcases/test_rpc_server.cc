@@ -13,7 +13,7 @@
 class OrderImpl : public Order {
  public:
   void makeOrder(google::protobuf::RpcController* controller,
-                 const ::makeOrderRquest* request,
+                 const ::makeOrderRequest* request,
                  ::makeOrderResponse* response,
                  ::google::protobuf::Closure* done) {
     if (request->price() < 10) {

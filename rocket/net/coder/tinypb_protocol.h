@@ -5,18 +5,18 @@
 namespace rocket {
 
 struct TinyPBProtocol : public AbstractProtocol {
-public:
+ public:
   static char PB_START;
   static char PB_END;
 
-public:
+ public:
   TinyPBProtocol() {}
   ~TinyPBProtocol() {}
 
-public:
+ public:
   int32_t m_pk_len{0};
-  int32_t m_req_id_len{0};
-  // req_id继承父类
+  int32_t m_msg_id_len{0};
+  // msg_id继承父类
   int32_t m_method_name_len{0};
   std::string m_method_name;
   int32_t m_err_code;
@@ -28,6 +28,6 @@ public:
   bool parse_success{false};
 };
 
-} // namespace rocket
+}  // namespace rocket
 
 #endif

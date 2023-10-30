@@ -36,7 +36,7 @@ TcpConnection::TcpConnection(
 }
 
 TcpConnection::~TcpConnection() {
-  DEBUGLOG("~TcpConnection::~TcpConnection()");
+  DEBUGLOG("~TcpConnection()");
   if (m_coder) {
     delete m_coder;
     m_coder = nullptr;
@@ -65,7 +65,7 @@ void TcpConnection::onRead() {
     int write_index = m_in_buffer->writeIndex();
 
     int rt = ::read(m_fd, &(m_in_buffer->m_buffer[write_index]), read_count);
-    DEBUGLOG("success read %d bytes from addr [%s], client fd[%d]", rt,
+    DEBUGLOG("success read %d bytes from addr [%s], client fd [%d]", rt,
              m_peer_addr->toString().c_str(), m_fd);
 
     if (rt > 0) {
@@ -176,14 +176,14 @@ void TcpConnection::excute() {
 
     m_coder->decode(result, m_in_buffer);
     for (auto &e : result) {
-      INFOLOG("success get request [%s] from client[%s]", e->m_req_id.c_str(),
+      INFOLOG("success get request [%s] from client [%s]", e->m_msg_id.c_str(),
               m_peer_addr->toString().c_str());
       // 1.针对每一个请求，调用rpc方法，获取响应message
       // 2. 将响应message放到发送缓冲区，监听可写事件回包
 
       auto message = std::make_shared<TinyPBProtocol>();
       // message->m_pb_data = "hello. this is rocket rpc test data";
-      // message->m_req_id = e->m_req_id;
+      // message->m_msg_id = e->m_msg_id;
 
       RpcDispatcher::GetRpcDispatcherInstance()->dispatch(e, message, this);
 
@@ -199,8 +199,8 @@ void TcpConnection::excute() {
     m_coder->decode(result, m_in_buffer);
 
     for (auto e : result) {
-      std::string req_id = e->m_req_id;
-      auto it = m_read_dones.find(req_id);
+      std::string msg_id = e->m_msg_id;
+      auto it = m_read_dones.find(msg_id);
       if (it != m_read_dones.end()) {
         it->second(e);
       }
@@ -272,8 +272,8 @@ void TcpConnection::pushSendMessage(
 }
 
 void TcpConnection::pushReadMessage(
-    const std::string req_id,
+    const std::string msg_id,
     std::function<void(AbstractProtocol::s_ptr)> done) {
-  m_read_dones.insert(std::make_pair(req_id, done));
+  m_read_dones.insert(std::make_pair(msg_id, done));
 }
 }  // namespace rocket

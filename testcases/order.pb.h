@@ -45,37 +45,37 @@ struct TableStruct_order_2eproto {
   static const uint32_t offsets[];
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_order_2eproto;
+class makeOrderRequest;
+struct makeOrderRequestDefaultTypeInternal;
+extern makeOrderRequestDefaultTypeInternal _makeOrderRequest_default_instance_;
 class makeOrderResponse;
 struct makeOrderResponseDefaultTypeInternal;
 extern makeOrderResponseDefaultTypeInternal _makeOrderResponse_default_instance_;
-class makeOrderRquest;
-struct makeOrderRquestDefaultTypeInternal;
-extern makeOrderRquestDefaultTypeInternal _makeOrderRquest_default_instance_;
 PROTOBUF_NAMESPACE_OPEN
+template<> ::makeOrderRequest* Arena::CreateMaybeMessage<::makeOrderRequest>(Arena*);
 template<> ::makeOrderResponse* Arena::CreateMaybeMessage<::makeOrderResponse>(Arena*);
-template<> ::makeOrderRquest* Arena::CreateMaybeMessage<::makeOrderRquest>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 
 // ===================================================================
 
-class makeOrderRquest final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:makeOrderRquest) */ {
+class makeOrderRequest final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:makeOrderRequest) */ {
  public:
-  inline makeOrderRquest() : makeOrderRquest(nullptr) {}
-  ~makeOrderRquest() override;
-  explicit PROTOBUF_CONSTEXPR makeOrderRquest(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  inline makeOrderRequest() : makeOrderRequest(nullptr) {}
+  ~makeOrderRequest() override;
+  explicit PROTOBUF_CONSTEXPR makeOrderRequest(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
-  makeOrderRquest(const makeOrderRquest& from);
-  makeOrderRquest(makeOrderRquest&& from) noexcept
-    : makeOrderRquest() {
+  makeOrderRequest(const makeOrderRequest& from);
+  makeOrderRequest(makeOrderRequest&& from) noexcept
+    : makeOrderRequest() {
     *this = ::std::move(from);
   }
 
-  inline makeOrderRquest& operator=(const makeOrderRquest& from) {
+  inline makeOrderRequest& operator=(const makeOrderRequest& from) {
     CopyFrom(from);
     return *this;
   }
-  inline makeOrderRquest& operator=(makeOrderRquest&& from) noexcept {
+  inline makeOrderRequest& operator=(makeOrderRequest&& from) noexcept {
     if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
   #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
@@ -98,20 +98,20 @@ class makeOrderRquest final :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const makeOrderRquest& default_instance() {
+  static const makeOrderRequest& default_instance() {
     return *internal_default_instance();
   }
-  static inline const makeOrderRquest* internal_default_instance() {
-    return reinterpret_cast<const makeOrderRquest*>(
-               &_makeOrderRquest_default_instance_);
+  static inline const makeOrderRequest* internal_default_instance() {
+    return reinterpret_cast<const makeOrderRequest*>(
+               &_makeOrderRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     0;
 
-  friend void swap(makeOrderRquest& a, makeOrderRquest& b) {
+  friend void swap(makeOrderRequest& a, makeOrderRequest& b) {
     a.Swap(&b);
   }
-  inline void Swap(makeOrderRquest* other) {
+  inline void Swap(makeOrderRequest* other) {
     if (other == this) return;
   #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
@@ -124,7 +124,7 @@ class makeOrderRquest final :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(makeOrderRquest* other) {
+  void UnsafeArenaSwap(makeOrderRequest* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
@@ -132,14 +132,14 @@ class makeOrderRquest final :
 
   // implements Message ----------------------------------------------
 
-  makeOrderRquest* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
-    return CreateMaybeMessage<makeOrderRquest>(arena);
+  makeOrderRequest* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<makeOrderRequest>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
-  void CopyFrom(const makeOrderRquest& from);
+  void CopyFrom(const makeOrderRequest& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom( const makeOrderRquest& from) {
-    makeOrderRquest::MergeImpl(*this, from);
+  void MergeFrom( const makeOrderRequest& from) {
+    makeOrderRequest::MergeImpl(*this, from);
   }
   private:
   static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
@@ -157,15 +157,15 @@ class makeOrderRquest final :
   void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(makeOrderRquest* other);
+  void InternalSwap(makeOrderRequest* other);
 
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "makeOrderRquest";
+    return "makeOrderRequest";
   }
   protected:
-  explicit makeOrderRquest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+  explicit makeOrderRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                        bool is_message_owned = false);
   public:
 
@@ -205,7 +205,7 @@ class makeOrderRquest final :
   void _internal_set_price(int32_t value);
   public:
 
-  // @@protoc_insertion_point(class_scope:makeOrderRquest)
+  // @@protoc_insertion_point(class_scope:makeOrderRequest)
  private:
   class _Internal;
 
@@ -416,7 +416,7 @@ class Order : public ::PROTOBUF_NAMESPACE_ID::Service {
   static const ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor* descriptor();
 
   virtual void makeOrder(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
-                       const ::makeOrderRquest* request,
+                       const ::makeOrderRequest* request,
                        ::makeOrderResponse* response,
                        ::google::protobuf::Closure* done);
 
@@ -449,7 +449,7 @@ class Order_Stub : public Order {
   // implements Order ------------------------------------------
 
   void makeOrder(::PROTOBUF_NAMESPACE_ID::RpcController* controller,
-                       const ::makeOrderRquest* request,
+                       const ::makeOrderRequest* request,
                        ::makeOrderResponse* response,
                        ::google::protobuf::Closure* done);
  private:
@@ -468,64 +468,64 @@ class Order_Stub : public Order {
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// makeOrderRquest
+// makeOrderRequest
 
 // int32 price = 1;
-inline void makeOrderRquest::clear_price() {
+inline void makeOrderRequest::clear_price() {
   _impl_.price_ = 0;
 }
-inline int32_t makeOrderRquest::_internal_price() const {
+inline int32_t makeOrderRequest::_internal_price() const {
   return _impl_.price_;
 }
-inline int32_t makeOrderRquest::price() const {
-  // @@protoc_insertion_point(field_get:makeOrderRquest.price)
+inline int32_t makeOrderRequest::price() const {
+  // @@protoc_insertion_point(field_get:makeOrderRequest.price)
   return _internal_price();
 }
-inline void makeOrderRquest::_internal_set_price(int32_t value) {
+inline void makeOrderRequest::_internal_set_price(int32_t value) {
   
   _impl_.price_ = value;
 }
-inline void makeOrderRquest::set_price(int32_t value) {
+inline void makeOrderRequest::set_price(int32_t value) {
   _internal_set_price(value);
-  // @@protoc_insertion_point(field_set:makeOrderRquest.price)
+  // @@protoc_insertion_point(field_set:makeOrderRequest.price)
 }
 
 // string goods = 2;
-inline void makeOrderRquest::clear_goods() {
+inline void makeOrderRequest::clear_goods() {
   _impl_.goods_.ClearToEmpty();
 }
-inline const std::string& makeOrderRquest::goods() const {
-  // @@protoc_insertion_point(field_get:makeOrderRquest.goods)
+inline const std::string& makeOrderRequest::goods() const {
+  // @@protoc_insertion_point(field_get:makeOrderRequest.goods)
   return _internal_goods();
 }
 template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
-void makeOrderRquest::set_goods(ArgT0&& arg0, ArgT... args) {
+void makeOrderRequest::set_goods(ArgT0&& arg0, ArgT... args) {
  
  _impl_.goods_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:makeOrderRquest.goods)
+  // @@protoc_insertion_point(field_set:makeOrderRequest.goods)
 }
-inline std::string* makeOrderRquest::mutable_goods() {
+inline std::string* makeOrderRequest::mutable_goods() {
   std::string* _s = _internal_mutable_goods();
-  // @@protoc_insertion_point(field_mutable:makeOrderRquest.goods)
+  // @@protoc_insertion_point(field_mutable:makeOrderRequest.goods)
   return _s;
 }
-inline const std::string& makeOrderRquest::_internal_goods() const {
+inline const std::string& makeOrderRequest::_internal_goods() const {
   return _impl_.goods_.Get();
 }
-inline void makeOrderRquest::_internal_set_goods(const std::string& value) {
+inline void makeOrderRequest::_internal_set_goods(const std::string& value) {
   
   _impl_.goods_.Set(value, GetArenaForAllocation());
 }
-inline std::string* makeOrderRquest::_internal_mutable_goods() {
+inline std::string* makeOrderRequest::_internal_mutable_goods() {
   
   return _impl_.goods_.Mutable(GetArenaForAllocation());
 }
-inline std::string* makeOrderRquest::release_goods() {
-  // @@protoc_insertion_point(field_release:makeOrderRquest.goods)
+inline std::string* makeOrderRequest::release_goods() {
+  // @@protoc_insertion_point(field_release:makeOrderRequest.goods)
   return _impl_.goods_.Release();
 }
-inline void makeOrderRquest::set_allocated_goods(std::string* goods) {
+inline void makeOrderRequest::set_allocated_goods(std::string* goods) {
   if (goods != nullptr) {
     
   } else {
@@ -537,7 +537,7 @@ inline void makeOrderRquest::set_allocated_goods(std::string* goods) {
     _impl_.goods_.Set("", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:makeOrderRquest.goods)
+  // @@protoc_insertion_point(field_set_allocated:makeOrderRequest.goods)
 }
 
 // -------------------------------------------------------------------

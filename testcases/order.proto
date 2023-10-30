@@ -1,7 +1,7 @@
 syntax = "proto3";
 option cc_generic_services = true;
 
-message makeOrderRquest {
+message makeOrderRequest {
   int32 price = 1;
   string goods = 2;
 }
@@ -13,5 +13,5 @@ message makeOrderResponse {
 }
 
 service Order {
-  rpc makeOrder (makeOrderRquest) returns (makeOrderResponse);
+  rpc makeOrder (makeOrderRequest) returns (makeOrderResponse);
 }

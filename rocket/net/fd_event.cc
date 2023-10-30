@@ -1,6 +1,8 @@
 #include "rocket/net/fd_event.h"
-#include <cstring>
+
 #include <fcntl.h>
+
+#include <cstring>
 
 namespace rocket {
 
@@ -18,11 +20,14 @@ std::function<void()> FdEvent::handler(TriggerEvent event_type) {
     return m_read_callback;
   } else if (event_type == TriggerEvent::OUT_EVNET) {
     return m_write_callback;
+  } else if (event_type == TriggerEvent::ERROR_EVENT) {
+    return m_error_callback;
   }
   return nullptr;
 }
 
-void FdEvent::listen(TriggerEvent event_type, std::function<void()> callback) {
+void FdEvent::listen(TriggerEvent event_type, std::function<void()> callback,
+                     std::function<void()> error_callback /* = nullptr*/) {
   if (event_type == TriggerEvent::IN_EVENT) {
     // 设置epoll_event的类型和FdEvent对应的回调函数
     m_listen_event.events |= EPOLLIN;
@@ -30,6 +35,12 @@ void FdEvent::listen(TriggerEvent event_type, std::function<void()> callback) {
   } else if (event_type == TriggerEvent::OUT_EVNET) {
     m_listen_event.events |= EPOLLOUT;
     m_write_callback = callback;
+  }
+
+  if (m_error_callback == nullptr) {
+    m_error_callback = error_callback;
+  } else {
+    m_error_callback = nullptr;
   }
   // 设置fdEvent对象指针
   m_listen_event.data.ptr = this;
@@ -51,4 +62,4 @@ void FdEvent::cancel(TriggerEvent event_type) {
   }
 }
 
-} // namespace rocket
+}  // namespace rocket
