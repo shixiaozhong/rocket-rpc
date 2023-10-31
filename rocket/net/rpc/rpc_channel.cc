@@ -10,6 +10,7 @@
 #include "rocket/net/coder/tinypb_protocol.h"
 #include "rocket/net/rpc/rpc_controller.h"
 #include "rocket/net/tcp/tcp_client.h"
+#include "rocket/net/timer_event.h"
 
 namespace rocket {
 
@@ -74,6 +75,20 @@ void RpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
   // 获取到当前对象的shared_ptr;
   s_ptr channel = shared_from_this();
 
+  // 添加定时任务
+  m_timer_event = std::make_shared<TimerEvent>(
+      my_controller->getTimeout(), false, [my_controller, channel]() mutable {
+        my_controller->StartCancel();
+        my_controller->setError(
+            ERROR_RPC_CALL_TIMEOUT,
+            "rpc call timeout " + std::to_string(my_controller->getTimeout()));
+        if (channel->getClosure()) {
+          channel->getClosure()->Run();
+        }
+        channel.reset();
+      });
+  m_client->addTimerEvent(m_timer_event);
+
   m_client->connect([req_protocol, channel]() mutable {
     RpcController* my_controller =
         dynamic_cast<RpcController*>(channel->getController());
@@ -114,6 +129,9 @@ void RpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
                 channel->getTcpClient()->getPeerAddr()->toString().c_str(),
                 channel->getTcpClient()->getLocalAddr()->toString().c_str());
 
+            // 当成功读取到回包后， 取消定时任务
+            channel->getTimerEvent()->setCancel(true);
+
             RpcController* my_controller =
                 dynamic_cast<RpcController*>(channel->getController());
 
@@ -142,8 +160,8 @@ void RpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,
                 channel->getTcpClient()->getPeerAddr()->toString().c_str(),
                 channel->getTcpClient()->getLocalAddr()->toString().c_str());
 
-            if (channel->getClouse()) {
-              channel->getClouse()->Run();
+            if (!my_controller->IsCanceled() && channel->getClosure()) {
+              channel->getClosure()->Run();
             }
             channel.reset();
           });
@@ -160,10 +178,12 @@ google::protobuf::Message* RpcChannel::getRequest() const {
 google::protobuf::Message* RpcChannel::getResponse() const {
   return m_response.get();
 }
-google::protobuf::Closure* RpcChannel::getClouse() const {
+google::protobuf::Closure* RpcChannel::getClosure() const {
   return m_closure.get();
 }
 
 TcpClient::s_ptr RpcChannel::getTcpClient() const { return m_client; }
+
+TimerEvent::s_ptr RpcChannel::getTimerEvent() const { return m_timer_event; }
 
 }  // namespace rocket

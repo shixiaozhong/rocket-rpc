@@ -4,6 +4,7 @@
 #include "rocket/net/fd_event.h"
 #include "rocket/net/tcp/net_addr.h"
 #include "rocket/net/tcp/tcp_connection.h"
+#include "rocket/net/timer_event.h"
 
 namespace rocket {
 class TcpClient {
@@ -35,6 +36,8 @@ class TcpClient {
   NetAddr::s_ptr getLocalAddr() const;
 
   void initLocalAddr();
+
+  void addTimerEvent(TimerEvent::s_ptr timer_event);
 
  private:
   int m_fd{-1};

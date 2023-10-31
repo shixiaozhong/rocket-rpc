@@ -184,4 +184,8 @@ std::string TcpClient::getConnectErrInfo() const {
 NetAddr::s_ptr TcpClient::getPeerAddr() const { return m_peer_addr; }
 NetAddr::s_ptr TcpClient::getLocalAddr() const { return m_local_addr; }
 
+void TcpClient::addTimerEvent(TimerEvent::s_ptr timer_event) {
+  m_event_loop->addTimerEvent(timer_event);
+}
+
 }  // namespace rocket
