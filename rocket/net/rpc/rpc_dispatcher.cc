@@ -5,6 +5,7 @@
 
 #include "rocket/common/err_code.h"
 #include "rocket/common/log.h"
+#include "rocket/common/runtime.h"
 #include "rocket/net/coder/tinypb_protocol.h"
 #include "rocket/net/rpc/rpc_controller.h"
 #include "rocket/net/tcp/net_addr.h"
@@ -85,6 +86,9 @@ void RpcDispatcher::dispatch(AbstractProtocol::s_ptr request,
   rpcController.setLocalAddr(connection->getLocalAddr());
   rpcController.setPeerAddr(connection->getPeerAddr());
   rpcController.setMsgId(req_protocol->m_msg_id);
+
+  RunTime::GetRunTime()->m_msg_id = req_protocol->m_msg_id;
+  RunTime::GetRunTime()->m_method_name = method_name;
 
   service->CallMethod(method, &rpcController, req_msg, rsp_msg, nullptr);
 

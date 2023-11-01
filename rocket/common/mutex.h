@@ -5,9 +5,9 @@
 
 namespace rocket {
 
-template <class T> class ScopeMutex {
-
-public:
+template <class T>
+class ScopeMutex {
+ public:
   ScopeMutex(T &mutex) : m_mutex(mutex) {
     m_mutex.lock();
     m_is_lock = true;
@@ -30,14 +30,14 @@ public:
     }
   }
 
-private:
+ private:
   T &m_mutex;
 
   bool m_is_lock{false};
 };
 
 class Mutex {
-public:
+ public:
   Mutex() { pthread_mutex_init(&m_mutex, NULL); }
 
   ~Mutex() { pthread_mutex_destroy(&m_mutex); }
@@ -46,10 +46,12 @@ public:
 
   void unlock() { pthread_mutex_unlock(&m_mutex); }
 
-private:
+  pthread_mutex_t *getMutex() { return &m_mutex; }
+
+ private:
   pthread_mutex_t m_mutex;
 };
 
-} // namespace rocket
+}  // namespace rocket
 
 #endif
