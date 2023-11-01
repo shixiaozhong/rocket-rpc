@@ -15,7 +15,11 @@ namespace rocket {
 
 static Logger *g_logger = NULL;
 
-Logger::Logger(LogLevel level) : m_set_level(level) {
+Logger::Logger(LogLevel level, int type /*type = 1*/)
+    : m_set_level(level), m_type(type) {
+  if (m_type == 0) {
+    return;
+  }
   m_async_logger = std::make_shared<AsyncLogger>(
       Config::GetGlobalConfig()->m_log_file_name + "_rpc",
       Config::GetGlobalConfig()->m_log_file_path,
@@ -51,6 +55,10 @@ void Logger::syncLoop() {
 }
 
 void Logger::init() {
+  if (m_type == 0) {
+    return;
+  }
+
   m_timer_event = std::make_shared<TimerEvent>(
       Config::GetGlobalConfig()->m_log_sync_inteval, true,
       std::bind(&Logger::syncLoop, this));
@@ -60,11 +68,11 @@ void Logger::init() {
 
 Logger *Logger::GetGlobalLogger() { return g_logger; }
 
-void Logger::InitGlobalLogger() {
+void Logger::InitGlobalLogger(int type /*type = 1*/) {
   LogLevel global_log_level =
       StringToLogLevel(Config::GetGlobalConfig()->m_log_level);
   printf("Init log level [%s]\n", LogLevelToString(global_log_level).c_str());
-  g_logger = new Logger(global_log_level);
+  g_logger = new Logger(global_log_level, type);
 
   g_logger->init();
 }
@@ -135,6 +143,9 @@ std::string LogEvent::toString() {
 }
 
 void Logger::pushLog(const std::string &msg) {
+  if (m_type == 0) {
+    printf(msg.c_str());
+  }
   ScopeMutex<Mutex> lock(m_mutex);
   m_buffer.push_back(msg);
   lock.unlock();

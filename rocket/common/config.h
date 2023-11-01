@@ -8,6 +8,7 @@ namespace rocket {
 class Config {
  public:
   Config(const char *xmlfile);
+  Config();
 
  public:
   static Config *GetGlobalConfig();
@@ -21,6 +22,9 @@ class Config {
   int m_log_max_file_size{0};
 
   int m_log_sync_inteval{0};  // 日志同步间隔，单位ms
+
+  int m_port{0};     // 端口号
+  int m_io_threads;  // io线程数量
 };
 
 }  // namespace rocket

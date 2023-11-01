@@ -7,5 +7,9 @@
     <log_max_file_size>104857600</log_max_file_size>
     <log_sync_interval>500</log_sync_interval>
   </log>
-  
+
+  <server>
+    <port>12345</port>
+    <io_threads>4</io_threads>
+  </server>
 </root>
